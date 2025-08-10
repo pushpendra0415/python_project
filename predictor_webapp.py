@@ -1,35 +1,31 @@
 import streamlit as st
 from predictor_model import load_and_prepare_data, train_models, evaluate_models, predict
 
-# Load and prepare the data
-X_train, X_test, y_train, y_test = load_and_prepare_data("RELIANCE.NS_data.csv")
+# Load data
+X_train, X_test, y_train, y_test, df = load_and_prepare_data("RELIANCE.NS_data_updated.csv")
 
-# Train the models
+# Train models
 lr_model, rf_model = train_models(X_train, y_train)
 
-# Evaluate models
-lr_mse, lr_r2, _ = evaluate_models(lr_model, X_test, y_test)
-rf_mse, rf_r2, _ = evaluate_models(rf_model, X_test, y_test)
+# Evaluate
+results = evaluate_models({"Linear Regression": lr_model, "Random Forest": rf_model}, X_test, y_test)
 
-# Streamlit UI
-st.title("Stock Close Price Predictor")
-st.write("Enter stock features to predict the Close price")
+st.title("Stock Price Prediction (Today/Next Day)")
+st.write("This app predicts **today's closing price** using today's or tomorrow's data.")
 
-open_val = st.number_input("Open Price", format="%.2f")
-high_val = st.number_input("High Price", format="%.2f")
-low_val = st.number_input("Low Price", format="%.2f")
-volume_val = st.number_input("Volume", format="%d")
+# Show model scores
+st.subheader("Model Performance")
+st.write(results)
 
-model_choice = st.selectbox("Choose model", ["Linear Regression", "Random Forest"])
+# Input form
+st.subheader("Enter Stock Data")
+open_val = st.number_input("Open Price", value=float(df['Open'].iloc[-1]))
+high_val = st.number_input("High Price", value=float(df['High'].iloc[-1]))
+low_val = st.number_input("Low Price", value=float(df['Low'].iloc[-1]))
+volume_val = st.number_input("Volume", value=float(df['Volume'].iloc[-1]))
+prev_close_val = st.number_input("Previous Close Price", value=float(df['Previous Close'].iloc[-1]))
 
-if st.button("Predict"):
-    if model_choice == "Linear Regression":
-        result = predict(lr_model, open_val, high_val, low_val, volume_val)
-    else:
-        result = predict(rf_model, open_val, high_val, low_val, volume_val)
-    st.success(f"📈 Predicted Close Price: {result:.2f}")
-
-# Show evaluation metrics
-st.write("### Model Evaluation")
-st.write(f"Linear Regression - MSE: {lr_mse:.2f}, R²: {lr_r2:.2f}")
-st.write(f"Random Forest - MSE: {rf_mse:.2f}, R²: {rf_r2:.2f}")
+# Prediction
+if st.button("Predict Today's Close Price"):
+    predicted_price = predict(lr_model, open_val, high_val, low_val, volume_val, prev_close_val)
+    st.success(f"Predicted Close Price: ₹{predicted_price:.2f}")
