@@ -20,7 +20,7 @@ st.write(results)
 # Input form
 st.subheader("Enter Stock Data")
 
-# Use session_state so user edits are not lost
+# Initialize session state (so defaults load only once)
 if "open_val" not in st.session_state:
     st.session_state.open_val = float(df['Open'].iloc[-1])
 if "high_val" not in st.session_state:
@@ -32,6 +32,7 @@ if "volume_val" not in st.session_state:
 if "prev_close_val" not in st.session_state:
     st.session_state.prev_close_val = float(df['Previous Close'].iloc[-1])
 
+# Editable inputs
 open_val = st.number_input("Open Price", value=st.session_state.open_val, step=0.01, format="%.2f")
 high_val = st.number_input("High Price", value=st.session_state.high_val, step=0.01, format="%.2f")
 low_val = st.number_input("Low Price", value=st.session_state.low_val, step=0.01, format="%.2f")
