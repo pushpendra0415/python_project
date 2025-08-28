@@ -19,11 +19,24 @@ st.write(results)
 
 # Input form
 st.subheader("Enter Stock Data")
-open_val = st.number_input("Open Price", value=float(df['Open'].iloc[-1]))
-high_val = st.number_input("High Price", value=float(df['High'].iloc[-1]))
-low_val = st.number_input("Low Price", value=float(df['Low'].iloc[-1]))
-volume_val = st.number_input("Volume", value=float(df['Volume'].iloc[-1]))
-prev_close_val = st.number_input("Previous Close Price", value=float(df['Previous Close'].iloc[-1]))
+
+# Use session_state so user edits are not lost
+if "open_val" not in st.session_state:
+    st.session_state.open_val = float(df['Open'].iloc[-1])
+if "high_val" not in st.session_state:
+    st.session_state.high_val = float(df['High'].iloc[-1])
+if "low_val" not in st.session_state:
+    st.session_state.low_val = float(df['Low'].iloc[-1])
+if "volume_val" not in st.session_state:
+    st.session_state.volume_val = float(df['Volume'].iloc[-1])
+if "prev_close_val" not in st.session_state:
+    st.session_state.prev_close_val = float(df['Previous Close'].iloc[-1])
+
+open_val = st.number_input("Open Price", value=st.session_state.open_val, step=0.01, format="%.2f")
+high_val = st.number_input("High Price", value=st.session_state.high_val, step=0.01, format="%.2f")
+low_val = st.number_input("Low Price", value=st.session_state.low_val, step=0.01, format="%.2f")
+volume_val = st.number_input("Volume", value=st.session_state.volume_val, step=1000.0, format="%.2f")
+prev_close_val = st.number_input("Previous Close Price", value=st.session_state.prev_close_val, step=0.01, format="%.2f")
 
 # Prediction
 if st.button("Predict Today's Close Price"):
